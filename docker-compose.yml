@@ -1,0 +1,36 @@
+version: "3.9"
+
+name: nchcsystem_2
+
+networks:
+  nchc_2:
+    external: false
+
+services:
+
+  nchc_xinference:
+    container_name: nchc_xinference
+    image: xprobe/xinference:latest
+    pull_policy: always
+    ports:
+      - 9997:9997    
+    volumes:
+      - ./storage/xinference_data:/data
+      - ./password.json:/password.json
+    tty: true
+    restart: unless-stopped
+    networks:
+      - nchc_2
+    environment:
+      - XINFERENCE_HOME=/data      
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command: xinference-local -H 0.0.0.0 --auth-config /password.json
+
+
+
